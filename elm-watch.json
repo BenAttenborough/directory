@@ -1,0 +1,10 @@
+{
+    "targets": {
+        "My target name": {
+            "inputs": [
+                "examples/interactive-webpage/DirectoryParser.elm"
+            ],
+            "output": "examples/interactive-webpage/directoryParser.js"
+        }
+    }
+}

@@ -1,0 +1,51 @@
+html,
+body {
+  background-color: #020;
+  color: greenyellow;
+  font-family: monospace;
+  font-size: large;
+}
+
+ul {
+  display: block;
+  list-style-type: disc;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 40px;
+}
+
+input {
+  background-color: transparent;
+  color: greenyellow;
+  font-family: monospace;
+  font-size: large;
+  width: 95%;
+  border: solid 3px greenyellow;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+input:focus {
+  outline: none;
+}
+
+.terminalOutput {
+  padding: 5px;
+  margin: 5px 0;
+}
+
+.main-container {
+  display: grid;
+  border: solid 3px yellowgreen;
+  border-radius: 3px;
+  padding: 5px;
+  height: 95vh;
+}
+
+@media (min-width: 800px) {
+  .main-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}

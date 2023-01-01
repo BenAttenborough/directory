@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link
+            rel="stylesheet"
+            href="reset.css"
+        />
+        <link
+            rel="stylesheet"
+            href="base.css"
+        />
+        <style>
+            
+        </style>
+    </head>
+
+    <body>
+        
+        <div id="elm-app-is-loaded-here"></div>
+        
+        <script src="directoryParser.js"></script>
+        <script>
+            var app = Elm.DirectoryParser.init({
+                node: document.getElementById("elm-app-is-loaded-here"),
+            });
+        </script>
+    </body>
+</html>
