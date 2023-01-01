@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672597120030"
+    "1672615756995"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9555,6 +9555,29 @@ var $author$project$Directory$listDir = function (directory) {
 		data.files);
 	return A2($elm$core$List$append, directories, files);
 };
+var $author$project$DirectoryParser$modelUpdater = F3(
+	function (directory, terminalOutput, model) {
+		if (directory.$ === 'Just') {
+			var modifiedDirectory = directory.a;
+			return _Utils_update(
+				model,
+				{
+					directoryTree: modifiedDirectory,
+					terminalInput: '',
+					terminalOutput: A2(
+						$elm$core$List$cons,
+						model.terminalInput,
+						A2($elm$core$List$append, model.terminalOutput, terminalOutput))
+				});
+		} else {
+			return _Utils_update(
+				model,
+				{
+					terminalInput: '',
+					terminalOutput: A2($elm$core$List$append, model.terminalOutput, terminalOutput)
+				});
+		}
+	});
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
 		return {col: col, problem: problem, row: row};
@@ -9633,40 +9656,27 @@ var $author$project$DirectoryParser$update = F2(
 							var _v3 = A2($author$project$Directory$changeDirectoryCommand, directoryName, model.directoryTree);
 							if (_v3.$ === 'Ok') {
 								var value = _v3.a;
-								return _Utils_update(
-									model,
-									{
-										directoryTree: value,
-										terminalInput: '',
-										terminalOutput: A2(
-											$elm$core$List$append,
-											model.terminalOutput,
-											_List_fromArray(
-												['Change directory: ' + directoryName]))
-									});
+								return A3(
+									$author$project$DirectoryParser$modelUpdater,
+									$elm$core$Maybe$Just(value),
+									_List_fromArray(
+										['Change directory: ' + directoryName]),
+									model);
 							} else {
 								var err = _v3.a;
-								return _Utils_update(
-									model,
-									{
-										terminalInput: '',
-										terminalOutput: A2(
-											$elm$core$List$append,
-											model.terminalOutput,
-											_List_fromArray(
-												[err]))
-									});
+								return A3(
+									$author$project$DirectoryParser$modelUpdater,
+									$elm$core$Maybe$Nothing,
+									_List_fromArray(
+										[err]),
+									model);
 							}
 						case 'LS':
-							return _Utils_update(
-								model,
-								{
-									terminalInput: '',
-									terminalOutput: A2(
-										$elm$core$List$append,
-										model.terminalOutput,
-										$author$project$Directory$listDir(model.directoryTree))
-								});
+							return A3(
+								$author$project$DirectoryParser$modelUpdater,
+								$elm$core$Maybe$Nothing,
+								$author$project$Directory$listDir(model.directoryTree),
+								model);
 						case 'MakeDir':
 							var name = command.a;
 							var _v4 = A2(
@@ -9675,79 +9685,56 @@ var $author$project$DirectoryParser$update = F2(
 								model.directoryTree);
 							if (_v4.$ === 'Ok') {
 								var val = _v4.a;
-								return _Utils_update(
-									model,
-									{
-										directoryTree: val,
-										terminalInput: '',
-										terminalOutput: A2(
-											$elm$core$List$append,
-											model.terminalOutput,
-											_List_fromArray(
-												['Made directory: ' + name]))
-									});
+								return A3(
+									$author$project$DirectoryParser$modelUpdater,
+									$elm$core$Maybe$Just(val),
+									_List_fromArray(
+										['Made directory: ' + name]),
+									model);
 							} else {
 								var err = _v4.a;
-								return _Utils_update(
-									model,
-									{
-										terminalInput: '',
-										terminalOutput: A2(
-											$elm$core$List$append,
-											model.terminalOutput,
-											_List_fromArray(
-												[err]))
-									});
+								return A3(
+									$author$project$DirectoryParser$modelUpdater,
+									$elm$core$Maybe$Nothing,
+									_List_fromArray(
+										[err]),
+									model);
 							}
 						case 'Touch':
 							var fileName = command.a;
 							var fileSize = command.b;
-							return _Utils_update(
-								model,
-								{
-									directoryTree: A2(
+							return A3(
+								$author$project$DirectoryParser$modelUpdater,
+								$elm$core$Maybe$Just(
+									A2(
 										$author$project$Directory$addFile,
 										A2($author$project$Directory$File, fileName, fileSize),
-										model.directoryTree),
-									terminalInput: '',
-									terminalOutput: A2(
-										$elm$core$List$append,
-										model.terminalOutput,
-										_List_fromArray(
-											['Created file']))
-								});
+										model.directoryTree)),
+								_List_fromArray(
+									['Created file']),
+								model);
 						case 'Clear':
-							return _Utils_update(
-								model,
-								{terminalInput: '', terminalOutput: _List_Nil});
+							return A3($author$project$DirectoryParser$modelUpdater, $elm$core$Maybe$Nothing, _List_Nil, model);
 						default:
-							return _Utils_update(
-								model,
-								{
-									terminalInput: '',
-									terminalOutput: A2(
-										$elm$core$List$append,
-										model.terminalOutput,
-										_List_fromArray(
-											[
-												A2($author$project$Directory$getLabelsRecursively, model.directoryTree, _List_Nil)
-											]))
-								});
+							return A3(
+								$author$project$DirectoryParser$modelUpdater,
+								$elm$core$Maybe$Nothing,
+								_List_fromArray(
+									[
+										A2($author$project$Directory$getLabelsRecursively, model.directoryTree, _List_Nil)
+									]),
+								model);
 					}
 				} else {
 					var error = parserResult.a;
-					return _Utils_update(
-						model,
-						{
-							terminalInput: '',
-							terminalOutput: A2(
-								$elm$core$List$append,
-								model.terminalOutput,
-								_List_fromArray(
-									[
-										'Error: ' + $elm$parser$Parser$deadEndsToString(error)
-									]))
-						});
+					return A3(
+						$author$project$DirectoryParser$modelUpdater,
+						$elm$core$Maybe$Nothing,
+						_List_fromArray(
+							[
+								'Error: ' + $elm$parser$Parser$deadEndsToString(error)
+							]),
+						model);
 				}
 			} else {
 				return model;
@@ -9823,11 +9810,13 @@ var $author$project$DirectoryParser$onKeyDown = function (tagger) {
 		'keydown',
 		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$keyCode));
 };
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Directory$directoryToHtml = function (dir) {
 	return A2(
@@ -10031,30 +10020,67 @@ var $author$project$DirectoryParser$view = function (_v0) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('terminalOutput')
+								$elm$html$Html$Attributes$class('terminal-output')
 							]),
-						A2(
-							$elm$core$List$map,
-							function (line) {
-								return A2(
-									$elm$html$Html$div,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(line)
-										]));
-							},
-							terminalOutput)),
-						A2(
-						$elm$html$Html$input,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$placeholder('Type your command'),
-								$elm$html$Html$Attributes$value(terminalInput),
-								$elm$html$Html$Events$onInput($author$project$DirectoryParser$OnChange),
-								$author$project$DirectoryParser$onKeyDown($author$project$DirectoryParser$OnKeyDown)
-							]),
-						_List_Nil)
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('ELM 9000')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								A2(
+									$elm$core$List$map,
+									function (line) {
+										return A2(
+											$elm$html$Html$p,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('command-line')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(line)
+												]));
+									},
+									terminalOutput)),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+										A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'auto 1fr')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												A2($elm$html$Html$Attributes$style, 'padding', '5px'),
+												A2($elm$html$Html$Attributes$style, 'width', 'auto')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('>')
+											])),
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$placeholder('Type your command'),
+												$elm$html$Html$Attributes$value(terminalInput),
+												$elm$html$Html$Events$onInput($author$project$DirectoryParser$OnChange),
+												$author$project$DirectoryParser$onKeyDown($author$project$DirectoryParser$OnKeyDown)
+											]),
+										_List_Nil)
+									]))
+							]))
 					]))
 			]));
 };

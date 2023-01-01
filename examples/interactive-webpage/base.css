@@ -22,9 +22,10 @@ input {
   font-family: monospace;
   font-size: large;
   width: 95%;
-  border: solid 3px greenyellow;
-  border-radius: 5px;
-  padding: 5px;
+  /* border: solid 3px greenyellow;
+  border-radius: 5px; */
+  border: none;
+  /* padding: 5px; */
 }
 
 input:focus {
@@ -42,6 +43,10 @@ input:focus {
   border-radius: 3px;
   padding: 5px;
   height: 95vh;
+}
+
+.terminal-output p {
+  margin: 4px 0;
 }
 
 @media (min-width: 800px) {

@@ -1,13 +1,13 @@
 module DirectoryParser exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (class, placeholder, value)
+import Directory exposing (..)
+import Html exposing (Html, button, div, input, p, text)
+import Html.Attributes exposing (class, placeholder, style, value)
 import Html.Events exposing (keyCode, on, onClick, onInput)
 import Json.Decode as Decode
 import Parser exposing (..)
 import Tree.Zipper as Zipper
-import Directory exposing (..)
 
 
 type alias Model =
@@ -38,18 +38,47 @@ view { terminalInput, directoryTree, terminalOutput } =
             , directoryTree |> toHtml
             ]
         , div []
-            [ div [ class "terminalOutput" ]
-                (List.map (\line -> div [] [ text line ]) terminalOutput)
-            , input
-                [ placeholder "Type your command"
-                , value terminalInput
-                , onInput OnChange
-                , onKeyDown OnKeyDown
+            [ div [ class "terminal-output" ]
+                [ p [] [ text "ELM 9000" ]
+                , div [ ]
+                    (List.map
+                        (\line ->
+                            p [ class "command-line" ] [ text line ]
+                        )
+                        terminalOutput
+                    )
+                , div [ style "display" "grid", style "grid-template-columns" "auto 1fr" ]
+                    [ p [ style "padding" "5px", style "width" "auto" ] [ text ">" ]
+                    , input
+                        [ placeholder "Type your command"
+                        , value terminalInput
+                        , onInput OnChange
+                        , onKeyDown OnKeyDown
+                        ]
+                        []
+                    ]
                 ]
-                []
             ]
         ]
 
+modelUpdater : Maybe (Zipper.Zipper Directory) -> List String -> Model -> Model
+modelUpdater directory terminalOutput model =
+    case directory of
+        Just modifiedDirectory ->
+            { model
+                | directoryTree = modifiedDirectory
+                , terminalOutput =
+                    model.terminalInput ::
+                    (List.append model.terminalOutput terminalOutput)
+                , terminalInput = ""
+            }
+        
+        Nothing ->
+            { model
+                | terminalOutput =
+                    List.append model.terminalOutput terminalOutput
+                , terminalInput = ""
+            }
 
 update : Msg -> Model -> Model
 update msg model =
@@ -69,72 +98,47 @@ update msg model =
                             CD directoryName ->
                                 case changeDirectoryCommand directoryName model.directoryTree of
                                     Ok value ->
-                                        { model
-                                            | directoryTree = value
-                                            , terminalOutput =
-                                                List.append model.terminalOutput [ "Change directory: " ++ directoryName ]
-                                            , terminalInput = ""
-                                        }
+                                        modelUpdater (Just value) [ "Change directory: " ++ directoryName ] model
 
                                     Err err ->
-                                        { model
-                                            | terminalOutput =
-                                                List.append model.terminalOutput [ err ]
-                                            , terminalInput = ""
-                                        }
+                                        modelUpdater Nothing [ err ] model
+          
 
                             LS ->
-                                { model
-                                    | terminalOutput =
-                                        List.append model.terminalOutput (listDir model.directoryTree)
-                                    , terminalInput = ""
-                                }
+                                modelUpdater Nothing (listDir model.directoryTree) model
+                             
 
                             MakeDir name ->
                                 case addFolderCommand (Directory name []) model.directoryTree of
                                     Ok val ->
-                                        { model
-                                            | directoryTree = val
-                                            , terminalOutput =
-                                                List.append model.terminalOutput [ "Made directory: " ++ name ]
-                                            , terminalInput = ""
-                                        }
+                                        modelUpdater (Just val) [ "Made directory: " ++ name ] model
+                                   
 
                                     Err err ->
-                                        { model
-                                            | terminalOutput =
-                                                List.append model.terminalOutput [ err ]
-                                            , terminalInput = ""
-                                        }
+                                        modelUpdater Nothing [ err ] model
+                                       
 
                             Touch fileName fileSize ->
-                                { model
-                                    | directoryTree = addFile (File fileName fileSize) model.directoryTree
-                                    , terminalOutput =
-                                        List.append model.terminalOutput [ "Created file" ]
-                                    , terminalInput = ""
-                                }
+                                modelUpdater 
+                                    (Just (addFile (File fileName fileSize) model.directoryTree)) 
+                                    [ "Created file" ] 
+                                    model
+                               
 
                             Clear ->
-                                { model
-                                    | terminalOutput = []
-                                    , terminalInput = ""
-                                }
+                                modelUpdater Nothing [] model
+                               
 
                             Pwd ->
-                                { model
-                                    | terminalOutput =
-                                        List.append model.terminalOutput [ getLabelsRecursively model.directoryTree [] ]
-                                    , terminalInput = ""
-                                }
+                                modelUpdater 
+                                    Nothing
+                                    [ getLabelsRecursively model.directoryTree [] ]
+                                    model
+                                
 
                     Err error ->
-                        { model
-                            | terminalOutput =
-                                List.append model.terminalOutput [ "Error: " ++ Parser.deadEndsToString error ]
-                            , terminalInput = ""
-                        }
-
+                        modelUpdater Nothing [ "Error: " ++ Parser.deadEndsToString error ] model
+                       
             else
                 model
 
