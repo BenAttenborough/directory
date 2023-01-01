@@ -1,0 +1,16 @@
+{
+  "name": "directory-tree",
+  "version": "1.0.0",
+  "description": "A tree representation of a file directory system, including commands to manipulate and traverse it",
+  "main": "/src/Directory.elm",
+  "scripts": {
+    "test": "elm-test"
+  },
+  "keywords": [
+    "elm",
+    "directory",
+    "tree"
+  ],
+  "author": "Ben Attenborough",
+  "license": "ISC"
+}
