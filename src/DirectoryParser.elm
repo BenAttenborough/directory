@@ -19,6 +19,15 @@ type alias Model =
     }
 
 
+type Command
+    = CD String
+    | LS
+    | MakeDir String
+    | Touch String Int
+    | Clear
+    | Pwd
+
+
 initialModel : Model
 initialModel =
     { terminalInput = ""
@@ -184,15 +193,6 @@ update msg model =
 onKeyDown : (Int -> msg) -> Html.Attribute msg
 onKeyDown tagger =
     on "keydown" (Decode.map tagger keyCode)
-
-
-type Command
-    = CD String
-    | LS
-    | MakeDir String
-    | Touch String Int
-    | Clear
-    | Pwd
 
 
 word : Parser String
