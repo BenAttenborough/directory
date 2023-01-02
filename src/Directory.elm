@@ -1,6 +1,5 @@
 module Directory exposing
     ( Directory
-    , DirectoryTree
     , File
     , addFile
     , addFiles
@@ -30,10 +29,6 @@ type alias File =
     { label : String
     , size : Int
     }
-
-
-type DirectoryTree a
-    = DirectoryTree Directory (List (DirectoryTree Directory))
 
 
 singleton : Directory -> Zipper.Zipper Directory
@@ -243,7 +238,6 @@ listDir directory =
 
 printRoute : Zipper.Zipper Directory -> String
 printRoute directory =
-    -- "TODO: Get route"
     directory
         |> Zipper.label
         |> .label
@@ -272,3 +266,12 @@ getLabelsRecursively list dir =
 
         Just directory ->
             getLabelsRecursively ((label ++ "/") :: list) directory
+
+
+sumFileSizes : Zipper.Zipper Directory -> Int
+sumFileSizes directory =
+    directory
+        |> Zipper.label
+        |> .files
+        |> List.map .size
+        |> List.sum

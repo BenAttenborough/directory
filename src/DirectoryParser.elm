@@ -43,6 +43,7 @@ view { terminalInput, directoryTree, terminalOutput } =
         , div []
             [ div [ class "terminal-output" ]
                 [ p [] [ text "ELM 9000" ]
+                , p [] [ text "Available commands: cd <name>, mkdir <name>, touch <name> <size>, ls, pwd, clear" ]
                 , div []
                     (List.map
                         (\line ->

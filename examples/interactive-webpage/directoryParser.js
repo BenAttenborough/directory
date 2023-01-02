@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672670262368"
+    "1672678310105"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10152,6 +10152,13 @@ var $author$project$DirectoryParser$view = function (_v0) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('ELM 9000')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Available commands: cd <name>, mkdir <name>, touch <name> <size>, ls, pwd, clear')
 									])),
 								A2(
 								$elm$html$Html$div,
