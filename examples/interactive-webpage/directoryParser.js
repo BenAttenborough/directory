@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672659447171"
+    "1672660649133"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7726,6 +7726,7 @@ var $author$project$Directory$singleton = function (directory) {
 		$zwilias$elm_rosetree$Tree$singleton(directory));
 };
 var $author$project$DirectoryParser$initialModel = {
+	commandBuffer: _List_Nil,
 	directoryTree: $author$project$Directory$singleton(
 		A2($author$project$Directory$Directory, 'root', _List_Nil)),
 	terminalInput: '',
@@ -9573,6 +9574,7 @@ var $author$project$DirectoryParser$modelUpdater = F3(
 		var newModel = _Utils_update(
 			model,
 			{
+				commandBuffer: A2($elm$core$List$cons, model.terminalInput, model.commandBuffer),
 				terminalInput: '',
 				terminalOutput: A2($elm$core$List$append, model.terminalOutput, terminalInputOutput)
 			});
@@ -9744,7 +9746,19 @@ var $author$project$DirectoryParser$update = F2(
 						model);
 				}
 			} else {
-				return model;
+				if (key === 38) {
+					var _v5 = model.commandBuffer;
+					if (!_v5.b) {
+						return model;
+					} else {
+						var command = _v5.a;
+						return _Utils_update(
+							model,
+							{terminalInput: command});
+					}
+				} else {
+					return model;
+				}
 			}
 		}
 	});

@@ -14,6 +14,7 @@ type alias Model =
     { terminalInput : String
     , directoryTree : Zipper.Zipper Directory
     , terminalOutput : List String
+    , commandBuffer : List String
     }
 
 
@@ -22,6 +23,7 @@ initialModel =
     { terminalInput = ""
     , directoryTree = singleton (Directory "root" [])
     , terminalOutput = []
+    , commandBuffer = []
     }
 
 
@@ -83,6 +85,7 @@ modelUpdater directory terminalOutput model =
             { model
                 | terminalOutput = List.append model.terminalOutput terminalInputOutput
                 , terminalInput = ""
+                , commandBuffer = model.terminalInput :: model.commandBuffer
             }
     in
     case directory of
@@ -146,6 +149,17 @@ update msg model =
 
                     Err error ->
                         modelUpdater Nothing [ "Error: " ++ Parser.deadEndsToString error ] model
+
+            else if key == 38 then
+                -- up key
+                case model.commandBuffer of
+                    [] ->
+                        model
+
+                    command :: _ ->
+                        { model
+                            | terminalInput = command
+                        }
 
             else
                 model
