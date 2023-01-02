@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672660649133"
+    "1672670262368"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7725,8 +7725,15 @@ var $author$project$Directory$singleton = function (directory) {
 	return $zwilias$elm_rosetree$Tree$Zipper$fromTree(
 		$zwilias$elm_rosetree$Tree$singleton(directory));
 };
+var $wernerdegroot$listzipper$List$Zipper$Zipper = F3(
+	function (a, b, c) {
+		return {$: 'Zipper', a: a, b: b, c: c};
+	});
+var $wernerdegroot$listzipper$List$Zipper$singleton = function (x) {
+	return A3($wernerdegroot$listzipper$List$Zipper$Zipper, _List_Nil, x, _List_Nil);
+};
 var $author$project$DirectoryParser$initialModel = {
-	commandBuffer: _List_Nil,
+	commandBuffer: $wernerdegroot$listzipper$List$Zipper$singleton(''),
 	directoryTree: $author$project$Directory$singleton(
 		A2($author$project$Directory$Directory, 'root', _List_Nil)),
 	terminalInput: '',
@@ -9508,6 +9515,10 @@ var $author$project$DirectoryParser$commandParser = A2(
 				$elm$parser$Parser$succeed($author$project$DirectoryParser$Pwd),
 				$elm$parser$Parser$keyword('pwd'))
 			])));
+var $wernerdegroot$listzipper$List$Zipper$current = function (_v0) {
+	var x = _v0.b;
+	return x;
+};
 var $elm$parser$Parser$deadEndsToString = function (deadEnds) {
 	return 'TODO deadEndsToString';
 };
@@ -9556,6 +9567,16 @@ var $author$project$Directory$listDir = function (directory) {
 		data.files);
 	return A2($elm$core$List$append, directories, files);
 };
+var $wernerdegroot$listzipper$List$Zipper$fromList = function (xs) {
+	if (!xs.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var y = xs.a;
+		var ys = xs.b;
+		return $elm$core$Maybe$Just(
+			A3($wernerdegroot$listzipper$List$Zipper$Zipper, _List_Nil, y, ys));
+	}
+};
 var $elm$core$String$append = _String_append;
 var $author$project$DirectoryParser$terminalPrompt = function (directory) {
 	return A2(
@@ -9563,6 +9584,33 @@ var $author$project$DirectoryParser$terminalPrompt = function (directory) {
 		A2($author$project$Directory$getLabelsRecursively, _List_Nil, directory),
 		' $ ');
 };
+var $wernerdegroot$listzipper$List$Zipper$after = function (_v0) {
+	var rs = _v0.c;
+	return rs;
+};
+var $wernerdegroot$listzipper$List$Zipper$before = function (_v0) {
+	var ls = _v0.a;
+	return $elm$core$List$reverse(ls);
+};
+var $wernerdegroot$listzipper$List$Zipper$toList = function (z) {
+	return _Utils_ap(
+		$wernerdegroot$listzipper$List$Zipper$before(z),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$wernerdegroot$listzipper$List$Zipper$current(z)
+				]),
+			$wernerdegroot$listzipper$List$Zipper$after(z)));
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$DirectoryParser$modelUpdater = F3(
 	function (directory, terminalOutput, model) {
 		var terminalInputOutput = A2(
@@ -9574,7 +9622,14 @@ var $author$project$DirectoryParser$modelUpdater = F3(
 		var newModel = _Utils_update(
 			model,
 			{
-				commandBuffer: A2($elm$core$List$cons, model.terminalInput, model.commandBuffer),
+				commandBuffer: A2(
+					$elm$core$Maybe$withDefault,
+					model.commandBuffer,
+					$wernerdegroot$listzipper$List$Zipper$fromList(
+						A2(
+							$elm$core$List$cons,
+							model.terminalInput,
+							$wernerdegroot$listzipper$List$Zipper$toList(model.commandBuffer)))),
 				terminalInput: '',
 				terminalOutput: A2($elm$core$List$append, model.terminalOutput, terminalInputOutput)
 			});
@@ -9587,6 +9642,40 @@ var $author$project$DirectoryParser$modelUpdater = F3(
 			return newModel;
 		}
 	});
+var $wernerdegroot$listzipper$List$Zipper$next = function (_v0) {
+	var ls = _v0.a;
+	var x = _v0.b;
+	var rs = _v0.c;
+	if (!rs.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var y = rs.a;
+		var ys = rs.b;
+		return $elm$core$Maybe$Just(
+			A3(
+				$wernerdegroot$listzipper$List$Zipper$Zipper,
+				A2($elm$core$List$cons, x, ls),
+				y,
+				ys));
+	}
+};
+var $wernerdegroot$listzipper$List$Zipper$previous = function (_v0) {
+	var ls = _v0.a;
+	var x = _v0.b;
+	var rs = _v0.c;
+	if (!ls.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var y = ls.a;
+		var ys = ls.b;
+		return $elm$core$Maybe$Just(
+			A3(
+				$wernerdegroot$listzipper$List$Zipper$Zipper,
+				ys,
+				y,
+				A2($elm$core$List$cons, x, rs)));
+	}
+};
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
 		return {col: col, problem: problem, row: row};
@@ -9747,17 +9836,29 @@ var $author$project$DirectoryParser$update = F2(
 				}
 			} else {
 				if (key === 38) {
-					var _v5 = model.commandBuffer;
-					if (!_v5.b) {
-						return model;
-					} else {
-						var command = _v5.a;
+					return _Utils_update(
+						model,
+						{
+							commandBuffer: A2(
+								$elm$core$Maybe$withDefault,
+								model.commandBuffer,
+								$wernerdegroot$listzipper$List$Zipper$next(model.commandBuffer)),
+							terminalInput: $wernerdegroot$listzipper$List$Zipper$current(model.commandBuffer)
+						});
+				} else {
+					if (key === 40) {
 						return _Utils_update(
 							model,
-							{terminalInput: command});
+							{
+								commandBuffer: A2(
+									$elm$core$Maybe$withDefault,
+									model.commandBuffer,
+									$wernerdegroot$listzipper$List$Zipper$previous(model.commandBuffer)),
+								terminalInput: $wernerdegroot$listzipper$List$Zipper$current(model.commandBuffer)
+							});
+					} else {
+						return model;
 					}
-				} else {
-					return model;
 				}
 			}
 		}

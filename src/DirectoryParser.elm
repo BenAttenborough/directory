@@ -6,6 +6,7 @@ import Html exposing (Html, button, div, input, p, text)
 import Html.Attributes exposing (class, placeholder, style, value)
 import Html.Events exposing (keyCode, on, onClick, onInput)
 import Json.Decode as Decode
+import List.Zipper
 import Parser exposing (..)
 import Tree.Zipper as Zipper
 
@@ -14,7 +15,7 @@ type alias Model =
     { terminalInput : String
     , directoryTree : Zipper.Zipper Directory
     , terminalOutput : List String
-    , commandBuffer : List String
+    , commandBuffer : List.Zipper.Zipper String
     }
 
 
@@ -23,7 +24,7 @@ initialModel =
     { terminalInput = ""
     , directoryTree = singleton (Directory "root" [])
     , terminalOutput = []
-    , commandBuffer = []
+    , commandBuffer = List.Zipper.singleton ""
     }
 
 
@@ -85,7 +86,11 @@ modelUpdater directory terminalOutput model =
             { model
                 | terminalOutput = List.append model.terminalOutput terminalInputOutput
                 , terminalInput = ""
-                , commandBuffer = model.terminalInput :: model.commandBuffer
+                , commandBuffer =
+                    model.terminalInput
+                        :: List.Zipper.toList model.commandBuffer
+                        |> List.Zipper.fromList
+                        |> Maybe.withDefault model.commandBuffer
             }
     in
     case directory of
@@ -152,14 +157,24 @@ update msg model =
 
             else if key == 38 then
                 -- up key
-                case model.commandBuffer of
-                    [] ->
-                        model
+                { model
+                    | terminalInput =
+                        List.Zipper.current model.commandBuffer
+                    , commandBuffer =
+                        Maybe.withDefault
+                            model.commandBuffer
+                            (List.Zipper.next model.commandBuffer)
+                }
 
-                    command :: _ ->
-                        { model
-                            | terminalInput = command
-                        }
+            else if key == 40 then
+                -- down key
+                { model
+                    | terminalInput = List.Zipper.current model.commandBuffer
+                    , commandBuffer =
+                        Maybe.withDefault
+                            model.commandBuffer
+                            (List.Zipper.previous model.commandBuffer)
+                }
 
             else
                 model
