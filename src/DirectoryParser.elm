@@ -40,7 +40,7 @@ view { terminalInput, directoryTree, terminalOutput } =
         , div []
             [ div [ class "terminal-output" ]
                 [ p [] [ text "ELM 9000" ]
-                , div [ ]
+                , div []
                     (List.map
                         (\line ->
                             p [ class "command-line" ] [ text line ]
@@ -61,24 +61,28 @@ view { terminalInput, directoryTree, terminalOutput } =
             ]
         ]
 
+
 modelUpdater : Maybe (Zipper.Zipper Directory) -> List String -> Model -> Model
 modelUpdater directory terminalOutput model =
+    let
+        terminalInputOutput =
+            ("> " ++ model.terminalInput) :: terminalOutput
+
+        newModel =
+            { model
+                | terminalOutput = List.append model.terminalOutput terminalInputOutput
+                , terminalInput = ""
+            }
+    in
     case directory of
         Just modifiedDirectory ->
-            { model
+            { newModel
                 | directoryTree = modifiedDirectory
-                , terminalOutput =
-                    model.terminalInput ::
-                    (List.append model.terminalOutput terminalOutput)
-                , terminalInput = ""
             }
-        
+
         Nothing ->
-            { model
-                | terminalOutput =
-                    List.append model.terminalOutput terminalOutput
-                , terminalInput = ""
-            }
+            newModel
+
 
 update : Msg -> Model -> Model
 update msg model =
@@ -102,43 +106,36 @@ update msg model =
 
                                     Err err ->
                                         modelUpdater Nothing [ err ] model
-          
 
                             LS ->
                                 modelUpdater Nothing (listDir model.directoryTree) model
-                             
 
                             MakeDir name ->
                                 case addFolderCommand (Directory name []) model.directoryTree of
                                     Ok val ->
                                         modelUpdater (Just val) [ "Made directory: " ++ name ] model
-                                   
 
                                     Err err ->
                                         modelUpdater Nothing [ err ] model
-                                       
 
                             Touch fileName fileSize ->
-                                modelUpdater 
-                                    (Just (addFile (File fileName fileSize) model.directoryTree)) 
-                                    [ "Created file" ] 
+                                modelUpdater
+                                    (Just (addFile (File fileName fileSize) model.directoryTree))
+                                    [ "Created file" ]
                                     model
-                               
 
                             Clear ->
                                 modelUpdater Nothing [] model
-                               
 
                             Pwd ->
-                                modelUpdater 
+                                modelUpdater
                                     Nothing
                                     [ getLabelsRecursively model.directoryTree [] ]
                                     model
-                                
 
                     Err error ->
                         modelUpdater Nothing [ "Error: " ++ Parser.deadEndsToString error ] model
-                       
+
             else
                 model
 

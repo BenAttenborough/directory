@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672615756995"
+    "1672657007463"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9557,25 +9557,20 @@ var $author$project$Directory$listDir = function (directory) {
 };
 var $author$project$DirectoryParser$modelUpdater = F3(
 	function (directory, terminalOutput, model) {
+		var terminalInputOutput = A2($elm$core$List$cons, '> ' + model.terminalInput, terminalOutput);
+		var newModel = _Utils_update(
+			model,
+			{
+				terminalInput: '',
+				terminalOutput: A2($elm$core$List$append, model.terminalOutput, terminalInputOutput)
+			});
 		if (directory.$ === 'Just') {
 			var modifiedDirectory = directory.a;
 			return _Utils_update(
-				model,
-				{
-					directoryTree: modifiedDirectory,
-					terminalInput: '',
-					terminalOutput: A2(
-						$elm$core$List$cons,
-						model.terminalInput,
-						A2($elm$core$List$append, model.terminalOutput, terminalOutput))
-				});
+				newModel,
+				{directoryTree: modifiedDirectory});
 		} else {
-			return _Utils_update(
-				model,
-				{
-					terminalInput: '',
-					terminalOutput: A2($elm$core$List$append, model.terminalOutput, terminalOutput)
-				});
+			return newModel;
 		}
 	});
 var $elm$parser$Parser$DeadEnd = F3(
