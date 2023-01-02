@@ -258,8 +258,8 @@ getLabelFromZipper dir =
     data.label
 
 
-getLabelsRecursively : Zipper.Zipper Directory -> List String -> String
-getLabelsRecursively dir list =
+getLabelsRecursively : List String -> Zipper.Zipper Directory -> String
+getLabelsRecursively list dir =
     let
         label =
             getLabelFromZipper dir
@@ -271,4 +271,4 @@ getLabelsRecursively dir list =
                 |> String.concat
 
         Just directory ->
-            getLabelsRecursively directory ((label ++ "/") :: list)
+            getLabelsRecursively ((label ++ "/") :: list) directory

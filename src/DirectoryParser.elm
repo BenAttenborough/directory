@@ -47,13 +47,18 @@ view { terminalInput, directoryTree, terminalOutput } =
                         )
                         terminalOutput
                     )
-                , div [ style "display" "grid", style "grid-template-columns" "auto 1fr" ]
-                    [ p [ style "padding" "5px", style "width" "auto" ] [ text ">" ]
+                , div
+                    [ style "display" "grid"
+                    , style "grid-template-columns" "auto 1fr"
+                    , style "margin-top" "-5px"
+                    ]
+                    [ p [] [ text (terminalPrompt directoryTree) ]
                     , input
                         [ placeholder "Type your command"
                         , value terminalInput
                         , onInput OnChange
                         , onKeyDown OnKeyDown
+                        , style "margin-left" "10px"
                         ]
                         []
                     ]
@@ -62,11 +67,17 @@ view { terminalInput, directoryTree, terminalOutput } =
         ]
 
 
+terminalPrompt : Zipper.Zipper Directory -> String
+terminalPrompt directory =
+    " $ "
+        |> String.append (getLabelsRecursively [] directory)
+
+
 modelUpdater : Maybe (Zipper.Zipper Directory) -> List String -> Model -> Model
 modelUpdater directory terminalOutput model =
     let
         terminalInputOutput =
-            ("> " ++ model.terminalInput) :: terminalOutput
+            (terminalPrompt model.directoryTree ++ model.terminalInput) :: terminalOutput
 
         newModel =
             { model
@@ -130,7 +141,7 @@ update msg model =
                             Pwd ->
                                 modelUpdater
                                     Nothing
-                                    [ getLabelsRecursively model.directoryTree [] ]
+                                    [ getLabelsRecursively [] model.directoryTree ]
                                     model
 
                     Err error ->

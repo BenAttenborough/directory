@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672657007463"
+    "1672659447171"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9518,7 +9518,7 @@ var $author$project$Directory$getLabelFromZipper = function (dir) {
 	return data.label;
 };
 var $author$project$Directory$getLabelsRecursively = F2(
-	function (dir, list) {
+	function (list, dir) {
 		getLabelsRecursively:
 		while (true) {
 			var label = $author$project$Directory$getLabelFromZipper(dir);
@@ -9528,10 +9528,10 @@ var $author$project$Directory$getLabelsRecursively = F2(
 					A2($elm$core$List$cons, label + '/', list));
 			} else {
 				var directory = _v0.a;
-				var $temp$dir = directory,
-					$temp$list = A2($elm$core$List$cons, label + '/', list);
-				dir = $temp$dir;
+				var $temp$list = A2($elm$core$List$cons, label + '/', list),
+					$temp$dir = directory;
 				list = $temp$list;
+				dir = $temp$dir;
 				continue getLabelsRecursively;
 			}
 		}
@@ -9555,9 +9555,21 @@ var $author$project$Directory$listDir = function (directory) {
 		data.files);
 	return A2($elm$core$List$append, directories, files);
 };
+var $elm$core$String$append = _String_append;
+var $author$project$DirectoryParser$terminalPrompt = function (directory) {
+	return A2(
+		$elm$core$String$append,
+		A2($author$project$Directory$getLabelsRecursively, _List_Nil, directory),
+		' $ ');
+};
 var $author$project$DirectoryParser$modelUpdater = F3(
 	function (directory, terminalOutput, model) {
-		var terminalInputOutput = A2($elm$core$List$cons, '> ' + model.terminalInput, terminalOutput);
+		var terminalInputOutput = A2(
+			$elm$core$List$cons,
+			_Utils_ap(
+				$author$project$DirectoryParser$terminalPrompt(model.directoryTree),
+				model.terminalInput),
+			terminalOutput);
 		var newModel = _Utils_update(
 			model,
 			{
@@ -9716,7 +9728,7 @@ var $author$project$DirectoryParser$update = F2(
 								$elm$core$Maybe$Nothing,
 								_List_fromArray(
 									[
-										A2($author$project$Directory$getLabelsRecursively, model.directoryTree, _List_Nil)
+										A2($author$project$Directory$getLabelsRecursively, _List_Nil, model.directoryTree)
 									]),
 								model);
 					}
@@ -10049,20 +10061,18 @@ var $author$project$DirectoryParser$view = function (_v0) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-										A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'auto 1fr')
+										A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'auto 1fr'),
+										A2($elm$html$Html$Attributes$style, 'margin-top', '-5px')
 									]),
 								_List_fromArray(
 									[
 										A2(
 										$elm$html$Html$p,
+										_List_Nil,
 										_List_fromArray(
 											[
-												A2($elm$html$Html$Attributes$style, 'padding', '5px'),
-												A2($elm$html$Html$Attributes$style, 'width', 'auto')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('>')
+												$elm$html$Html$text(
+												$author$project$DirectoryParser$terminalPrompt(directoryTree))
 											])),
 										A2(
 										$elm$html$Html$input,
@@ -10071,7 +10081,8 @@ var $author$project$DirectoryParser$view = function (_v0) {
 												$elm$html$Html$Attributes$placeholder('Type your command'),
 												$elm$html$Html$Attributes$value(terminalInput),
 												$elm$html$Html$Events$onInput($author$project$DirectoryParser$OnChange),
-												$author$project$DirectoryParser$onKeyDown($author$project$DirectoryParser$OnKeyDown)
+												$author$project$DirectoryParser$onKeyDown($author$project$DirectoryParser$OnKeyDown),
+												A2($elm$html$Html$Attributes$style, 'margin-left', '10px')
 											]),
 										_List_Nil)
 									]))
